@@ -47,13 +47,14 @@ int main (int argc, char **argv) {
 
 	int i;
 	int mino = 6;
+	int maxo_gbl = INT_MAX;
 	int pctdiff = 8;				// this number tested well on exome data... tweak for best results
 	bool omode = false;
 	char *bfil = NULL;
     bool norevcomp = false;
     bool allow_ex = false;
 
-	while (	(c = getopt (argc, argv, "-dhRnbeo:t:v:m:p:r:xV")) != -1) {
+	while (	(c = getopt (argc, argv, "-dhRnbeo:t:v:m:p:M:r:xV")) != -1) {
 		switch (c) {
 		case '\1':
 			if (!in[0])
@@ -77,6 +78,7 @@ int main (int argc, char **argv) {
 		case 't': threads = atoi(optarg); break;
         case 'V': printf("Version: %s.%d\n", VERSION, SVNREV); return 0; break;
 		case 'm': mino = atoi(optarg); break;
+		case 'M': maxo_gbl = atoi(optarg); break;
 		case 'x': allow_ex = true; break;
 		case 'p': pctdiff = atoi(optarg); break;
 		case 'R': norevcomp = true; break;
@@ -218,7 +220,7 @@ int main (int argc, char **argv) {
 
 		if (debug) fprintf(stderr, "comp: %s %d\n", rc.seq.s, rc.seq.n);
 
-		int maxo = min(fq[0].seq.n, rc.seq.n);
+		int maxo = min(min(fq[0].seq.n, rc.seq.n), maxo_gbl);
 		int bestscore=INT_MAX;
 		int besto=-1;
 		for (i=mino; i <= maxo; ++i) {
@@ -401,7 +403,7 @@ int main (int argc, char **argv) {
 
 void usage(FILE *f) {
 	fprintf(f,
-"Usage: fastq-join [options] <read1.fq> <read2.fq> [mate.fq] -o <read.%.fq>\n"
+"Usage: fastq-join [options] <read1.fq> <read2.fq> [mate.fq] -o <read.%%.fq>\n"
 "Version: %s.%d\n"
 "\n"
 "Joins two paired-end reads on the overlapping ends.\n"
@@ -413,6 +415,7 @@ void usage(FILE *f) {
 "            use ' ' (space) for Illumina reads\n"
 "-p N       N-percent maximum difference (8)\n"
 "-m N       N-minimum overlap (6)\n"
+"-M N       N-maximum overlap (INT_MAX)\n"
 "-r FIL     Verbose stitch length report\n"
 "-R         No reverse complement\n"
 "-x         Allow insert < read length\n"
