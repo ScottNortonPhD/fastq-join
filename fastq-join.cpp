@@ -128,7 +128,7 @@ int main (int argc, char **argv) {
 			out[i]=(char *)malloc(strlen(pre)+10);
 			strcpy(out[i], pre);
 			char *p;
-			if (p=strchr(out[i], '%')) {
+			if ((p=strchr(out[i], '%'))) {
 				// substiture instead of append
 				strcpy(p, suffix[i]);
 				strcpy(p+strlen(suffix[i]), pre+(p-out[i])+1);
@@ -159,12 +159,12 @@ int main (int argc, char **argv) {
 	// some basic validation of the file formats
 	{
 		for (i=0;i<in_n;++i) {
-			char c=getc(fin[i]);
-			if (c != '@')  {
-				fprintf(stderr, "%s doesn't appear to be a fastq file (%c)\n", in[i], c);
+			char c_=getc(fin[i]);
+			if (c_ != '@')  {
+				fprintf(stderr, "%s doesn't appear to be a fastq file (%c)\n", in[i], c_);
 				return 1;
 			}
-			ungetc(c, fin[i]);
+			ungetc(c_, fin[i]);
 		}
 	}
 
@@ -183,7 +183,7 @@ int main (int argc, char **argv) {
 	meminit(rc);
 
 	// read in 1 record from each file
-	while (read_ok=read_fq(fin[0], nrec, &fq[0])) {
+	while ((read_ok=read_fq(fin[0], nrec, &fq[0]))) {
 		for (i=1;i<in_n;++i) {
 		int mate_ok=read_fq(fin[i], nrec, &fq[i]);
 		if (read_ok != mate_ok) {
